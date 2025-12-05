@@ -80,7 +80,7 @@
             padding: 40px;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 40px rgba(0, 0, 0, 0.1);
             min-height: 400px;
         }
 
@@ -98,7 +98,7 @@
             border: none;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 53px 55px 55px 60px rgba(0,0,0,0.8);
+            box-shadow: 5px 15px 10px rgba(0,0,0,0.09);
         }
 
         .result-card h5 {
