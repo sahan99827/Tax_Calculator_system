@@ -4,6 +4,8 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding-top: 100px;
+            background: #d9b0bb;
+            background: radial-gradient(circle, rgba(217, 176, 187, 1) 0%, rgba(194, 214, 237, 1) 100%);
         }
         
         .nav-container {
@@ -16,7 +18,8 @@
         }
 
         .curved-nav {
-            background: linear-gradient(90deg, #16a085 0%, #2ecc71 25%, #3498db 50%, #8e44ad 100%);
+            background: #378690;
+            background: linear-gradient(0deg, rgba(55, 134, 144, 1) 0%, rgba(58, 182, 199, 1) 100%);
             border-radius: 50px;
             padding: 15px 30px;
             box-shadow: 0 15px 35px rgba(22, 160, 133, 0.4);
@@ -95,7 +98,7 @@
             border: none;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 53px 55px 55px 60px rgba(0,0,0,0.8);
         }
 
         .result-card h5 {
