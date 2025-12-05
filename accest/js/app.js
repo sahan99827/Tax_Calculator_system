@@ -404,7 +404,7 @@ const navLinks = document.querySelectorAll('.nav-link-custom');
         
         const getSSCLTaxHTML = () => `
             <h2><i class="fas fa-file-invoice-dollar me-2"></i> SSCL Tax (Sales and VAT)</h2>
-            <p class="text-muted">Calculate **Sale Tax (2.5%)** and **VAT (15%)** applied after adding the sale tax.</p>
+            <p class="text-muted">Calculate <b>Sale Tax (2.5%)</b> and <b>VAT (15%)</b> applied after adding the sale tax.</p>
             
             <form id="ssclTaxForm">
                 <div class="mb-3">
