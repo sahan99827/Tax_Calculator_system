@@ -1,4 +1,4 @@
-  const navLinks = document.querySelectorAll('.nav-link-custom');
+const navLinks = document.querySelectorAll('.nav-link-custom');
         const contentArea = document.getElementById('contentArea');
         const formatter = new Intl.NumberFormat('en-IN', { 
             style: 'currency', 
@@ -132,6 +132,25 @@
                 breakdown: taxBreakdown
             };
         }
+        
+        function calculateSSCLTax(value) {
+            const saleTaxRate = 0.025; // 2.5%
+            const vatRate = 0.15;     // 15%
+
+            const saleTax = value * saleTaxRate;
+            const afterSaleTax = value + saleTax;
+            const vat = afterSaleTax * vatRate;
+            const sscl = saleTax + vat;
+
+            return {
+                saleTax: saleTax,
+                afterSaleTax: afterSaleTax,
+                vat: vat,
+                sscl: sscl,
+                baseValue: value
+            };
+        }
+
 
         // --- HTML TEMPLATES ---
 
@@ -235,7 +254,66 @@
                             <th>Tax in Slab (Rs.)</th>
                         </tr>
                     </thead>
-                    <tbody id="taxBreakdownTableBody"> </tbody>
+                    <tbody id="taxBreakdownTableBody">
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        const getSSCLTaxHTML = () => `
+            <h2><i class="fas fa-file-invoice-dollar me-2"></i> SSCL Tax (Sales and VAT)</h2>
+            <p class="text-muted">Calculate <b>Sale Tax (2.5%)</b> and <b>VAT (15%)</b> applied after adding the sale tax.</p>
+            
+            <form id="ssclTaxForm">
+                <div class="mb-3">
+                    <label for="baseValue" class="form-label">Base Value/Cost (Rs.)</label>
+                    <input type="number" class="form-control" id="baseValue" name="baseValue" placeholder="Enter base value of sale/service" min="1" required>
+                    <div class="invalid-feedback" id="valueFeedback">Please enter a valid base value (must be a number > 0).</div>
+                </div>
+                <button type="submit" class="btn btn-success"><i class="fas fa-check-circle me-2"></i> Calculate SSCL</button>
+                <button type="reset" class="btn btn-outline-secondary ms-2"><i class="fas fa-redo me-2"></i> Reset Form</button>
+            </form>
+
+            <div id="results" class="mt-4" style="display:none;">
+                <h4 class="text-primary mt-4">Calculation Results</h4>
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="result-card">
+                            <h5 class="card-title">Sale Tax (2.5%)</h5>
+                            <div class="result-value" id="saleTaxResult"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="result-card">
+                            <h5 class="card-title">After-Sale Tax Amount</h5>
+                            <div class="result-value" id="afterSaleTaxResult"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="result-card">
+                            <h5 class="card-title">VAT (15%)</h5>
+                            <div class="result-value" id="vatResult"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="result-card bg-primary text-white">
+                            <h5 class="card-title">Final SSCL Value</h5>
+                            <div class="result-value text-white" id="ssclResult"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Calculation Breakdown</h5>
+                <table class="table table-striped table-bordered mt-3">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Step</th>
+                            <th>Formula</th>
+                            <th>Result (Rs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taxBreakdownTableBody">
+                    </tbody>
                 </table>
             </div>
         `;
@@ -243,8 +321,8 @@
         const contentData = {
             payable: getPayableTaxHTML,
             income: getIncomeTaxHTML,
+            sscl: getSSCLTaxHTML, 
             withholding: () => `<h2><i class="fas fa-hand-holding-usd me-2"></i> Withholding Tax</h2><p>This module handles Rent Tax, Bank Interest Tax, and Dividend Tax calculations. (Implementation required)</p>`,
-            sscl: () => `<h2><i class="fas fa-file-invoice-dollar me-2"></i> SSCL Tax</h2><p>This module handles Sale Tax (2.5%) and VAT (15%) calculations. (Implementation required)</p>`,
             leasing: () => `<h2><i class="fas fa-car me-2"></i> Leasing Calculations</h2><p>This module calculates Monthly Installments and Max Loan Value using the EMI formula. (Implementation required)</p>`,
         };
 
@@ -313,7 +391,7 @@
             const incomeInput = document.getElementById('annualIncome');
             const resultsDiv = document.getElementById('results');
             const feedbackDiv = document.getElementById('incomeFeedback');
-            const breakdownBody = document.getElementById('taxBreakdownTableBody'); // Using the harmonized ID
+            const breakdownBody = document.getElementById('taxBreakdownTableBody');
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -364,6 +442,70 @@
             });
         }
 
+        function attachSSCLTaxListeners() {
+            const form = document.getElementById('ssclTaxForm');
+            const valueInput = document.getElementById('baseValue');
+            const resultsDiv = document.getElementById('results');
+            const feedbackDiv = document.getElementById('valueFeedback');
+            const breakdownBody = document.getElementById('taxBreakdownTableBody');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const value = parseFloat(valueInput.value);
+                
+                // Validation check
+                if (isNaN(value) || value <= 0) {
+                    valueInput.classList.add('is-invalid');
+                    feedbackDiv.textContent = 'Please enter a valid base value (must be a number > 0).';
+                    resultsDiv.style.display = 'none';
+                    return;
+                } else {
+                    valueInput.classList.remove('is-invalid');
+                    feedbackDiv.textContent = '';
+                }
+
+                const result = calculateSSCLTax(value);
+                
+                // Display results
+                document.getElementById('saleTaxResult').textContent = formatter.format(result.saleTax);
+                document.getElementById('afterSaleTaxResult').textContent = formatter.format(result.afterSaleTax);
+                document.getElementById('vatResult').textContent = formatter.format(result.vat);
+                document.getElementById('ssclResult').textContent = formatter.format(result.sscl);
+                
+                // Display breakdown
+                breakdownBody.innerHTML = `
+                    <tr>
+                        <td>1. Sale Tax (**2.5%** of Base Value)</td>
+                        <td>${formatter.format(result.baseValue)} × 0.025</td>
+                        <td>${formatter.format(result.saleTax)}</td>
+                    </tr>
+                    <tr>
+                        <td>2. After-Sale Tax Amount</td>
+                        <td>Base Value + Sale Tax</td>
+                        <td>${formatter.format(result.afterSaleTax)}</td>
+                    </tr>
+                    <tr>
+                        <td>3. VAT (**15%** of After-Sale Tax Amount)</td>
+                        <td>${formatter.format(result.afterSaleTax)} × 0.15</td>
+                        <td>${formatter.format(result.vat)}</td>
+                    </tr>
+                    <tr class="table-info">
+                        <td>4. **Final SSCL Value**</td>
+                        <td>Sale Tax + VAT</td>
+                        <td>**${formatter.format(result.sscl)}**</td>
+                    </tr>
+                `;
+
+                resultsDiv.style.display = 'block';
+            });
+            
+            form.addEventListener('reset', function() {
+                 valueInput.classList.remove('is-invalid');
+                 resultsDiv.style.display = 'none';
+                 feedbackDiv.textContent = 'Please enter a valid base value (must be a number > 0).';
+            });
+        }
+
 
         // --- RENDER CONTENT CORE LOGIC ---
 
@@ -371,11 +513,12 @@
             const contentFn = contentData[section]; 
             contentArea.innerHTML = contentFn ? contentFn() : '<h2>Module Not Found</h2><p>Please select a module from the navigation bar.</p>';
 
-            // **FIX: Attach listener based on the rendered section**
             if (section === "payable") {
                 attachPayableTaxListeners();
             } else if (section === "income") { 
                 attachIncomeTaxListeners();
+            } else if (section === "sscl") { // Added SSCL listener attachment
+                attachSSCLTaxListeners();
             }
         };
 
@@ -405,6 +548,10 @@
                             document.getElementById('payableTaxForm').reset();
                             resetSuccess = true;
                             resetText = "The Payable Tax form has been reset.";
+                         } else if (activeSection === 'sscl') { // Added SSCL form reset
+                            document.getElementById('ssclTaxForm').reset();
+                            resetSuccess = true;
+                            resetText = "The SSCL Tax form has been reset.";
                          }
 
                          if (resetSuccess) {
@@ -446,9 +593,10 @@
             });
         });
 
-        // Initial load: render the Income Tax module (as per the last implementation step)
+        // Initial load: render the Income Tax module (or change this to 'sscl' if you prefer to test the new feature first)
         window.addEventListener('load', () => {
-            renderContent('income');
+            renderContent('sscl'); // Loading the new SSCL module initially for testing
             // Ensure the correct link is active on initial load
-            document.querySelector('.nav-link-custom[data-section="income"]').classList.add('active');
+            document.querySelector('.nav-link-custom[data-section="sscl"]').classList.add('active');
+            document.querySelector('.nav-link-custom[data-section="income"]').classList.remove('active'); // Remove initial income active state
         });
