@@ -490,7 +490,7 @@ const navLinks = document.querySelectorAll('.nav-link-custom');
                 <div class="col-lg-6 mb-5">
                     <div class="card shadow-sm border-0 h-100 p-3">
                         <div class="card-body">
-                            <h4 class="card-title text-info"><i class="fas fa-dollar-sign me-2"></i> Max Loan Value (Reverse)</h4>
+                            <h4 class="card-title" style="color:0C0C4D"><i class="fas fa-dollar-sign me-2"></i> Max Loan Value (Reverse)</h4>
                             <form id="reverseForm">
                                 <div class="mb-3">
                                     <label for="maxMonthlyPayment" class="form-label">Max Monthly Payment (Rs.)</label>
