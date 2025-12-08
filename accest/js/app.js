@@ -190,7 +190,7 @@ const navLinks = document.querySelectorAll('.nav-link-custom');
         function calculateSSCLTax(value) {
             // ... (Same logic as previous steps)
             const saleTaxRate = 0.025; // 2.5%
-            const vatRate = 0.15;     // 15%
+            const vatRate = 0.18;     // 18%
 
             const saleTax = value * saleTaxRate;
             const afterSaleTax = value + saleTax;
